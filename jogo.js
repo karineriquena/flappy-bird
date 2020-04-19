@@ -63,6 +63,7 @@ const chao = {
   },
 };
 
+// ["passarinho"]
 const flappyBird = {
     spriteX: 0,
     spriteY: 0,
@@ -70,6 +71,12 @@ const flappyBird = {
     altura: 24,
     x: 10,
     y: 50,
+    gravidade: 0.25,
+    velocidade: 0,
+    atualiza() {
+      flappyBird.velocidade += flappyBird.gravidade;
+      flappyBird.y += flappyBird.velocidade;
+    },
     desenha() {
         // Desenhar vários quadros da tela a cada segundo = FPS
         contexto.drawImage(
@@ -83,10 +90,11 @@ const flappyBird = {
 }
 
 function loop() { 
+    flappyBird.atualiza();
     planoDeFundo.desenha();
     chao.desenha();
     flappyBird.desenha();
-    flappyBird.y = flappyBird.y + 1;
+
     requestAnimationFrame(loop); // Função do JS, ajudar a desenhar os quadros na tela de forma inteligente
 }
 
