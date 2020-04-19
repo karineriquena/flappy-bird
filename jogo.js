@@ -89,13 +89,75 @@ const flappyBird = {
     }
 }
 
-function loop() { 
-    flappyBird.atualiza();
+// ["tela inicial"] GetReady
+const mensagemGetReady = {
+  sX: 134,
+  sY: 0,
+  w: 174,
+  h: 152,
+  x: (canvas.width / 2) - 174 / 2,
+  y: 50,
+  desenha() {
+    contexto.drawImage(
+      sprites,
+      mensagemGetReady.sX, mensagemGetReady.sY,
+      mensagemGetReady.w, mensagemGetReady.h,
+      mensagemGetReady.x, mensagemGetReady.y,
+      mensagemGetReady.w, mensagemGetReady.h
+    );
+  },
+  atualiza() {
+
+  }
+}
+
+//
+// Telas
+//
+let telaAtiva = {};
+function mudaParaTela(novaTela) {
+  telaAtiva = novaTela;
+}
+
+const Telas = {
+  INICIO: {
+    desenha() {
+      planoDeFundo.desenha();
+      chao.desenha();
+      flappyBird.desenha();
+      mensagemGetReady.desenha();
+    },
+    click() {
+      mudaParaTela(Telas.JOGO);
+    },
+    atualiza() {
+      mensagemGetReady.atualiza();
+    }
+  } 
+};
+
+Telas.JOGO = {
+  desenha() { 
     planoDeFundo.desenha();
     chao.desenha();
     flappyBird.desenha();
-
-    requestAnimationFrame(loop); // Função do JS, ajudar a desenhar os quadros na tela de forma inteligente
+  },
+  atualiza() {
+    flappyBird.atualiza();
+  }
 }
 
+function loop() { 
+  telaAtiva.desenha();
+  telaAtiva.atualiza();
+  requestAnimationFrame(loop); // Função do JS, ajudar a desenhar os quadros na tela de forma inteligente
+}
+
+window.addEventListener('click', function() {
+  if (telaAtiva.click) {
+    telaAtiva.click();
+  }
+});
+
+mudaParaTela(Telas.INICIO);
 loop();
