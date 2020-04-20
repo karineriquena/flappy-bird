@@ -1,5 +1,7 @@
 console.log('[DevSoutinho] Flappy Bird');
 
+let frames = 0;
+
 const som_HIT = new Audio();
 som_HIT.src = './efeitos/hit.wav';
 
@@ -105,8 +107,18 @@ function criaFlappyBird() {
     gravidade: 0.25,
     velocidade: 0,
     pulo: 4.6,
+    movimentos: [
+      { spriteX: 0, spriteY: 0 },  // asa para cima
+      { spriteX: 0, spriteY: 26 }, // asa no meio
+      { spriteX: 0, spriteY: 52 }, // asa para baixo
+      { spriteX: 0, spriteY: 26 }, // asa no meio
+    ],
+    frameAtual: 0,
     pula() {
+      console.log('devo pular');
+      console.log('[antes]', flappyBird.velocidade);
       flappyBird.velocidade = -flappyBird.pulo;
+      console.log('[depois]', flappyBird.velocidade);
     },
     atualiza() {
       if (fazColisao(flappyBird, globais.chao)) {
@@ -119,15 +131,30 @@ function criaFlappyBird() {
       flappyBird.velocidade += flappyBird.gravidade;
       flappyBird.y += flappyBird.velocidade;
     },
+    atualizaOFrameAtual() {
+      const intervaloDeFrames = 10;
+      const passouOIntervalo = frames % intervaloDeFrames == 0;
+      if (passouOIntervalo) {
+        const baseDoIncremento = 1;
+        const incremento = baseDoIncremento + flappyBird.frameAtual;
+        const baseRepeticao = flappyBird.movimentos.length;
+        flappyBird.frameAtual = incremento % baseRepeticao;
+      }
+      // console.log('[incremento]', incremento);
+      // console.log('[baseRepeticao]', baseRepeticao);
+      // console.log('[frame]', incremento % baseRepeticao);
+    },
     desenha() {
-        // Desenhar vários quadros da tela a cada segundo = FPS
-        contexto.drawImage(
-            sprites,
-            flappyBird.spriteX, flappyBird.spriteY, // Sprite X, Sprite Y
-            flappyBird.largura, flappyBird.altura, // Tamanho do recorte na sprite  
-            flappyBird.x, flappyBird.y, // Dentro do canvas, onde vai desenhar a imagem
-            flappyBird.largura, flappyBird.altura, // Dentro do canvas, qual vai ser o tamanho do desenho
-        );
+      flappyBird.atualizaOFrameAtual();
+      const { spriteX, spriteY } = flappyBird.movimentos[flappyBird.frameAtual];
+      // Desenhar vários quadros da tela a cada segundo = FPS
+      contexto.drawImage(
+        sprites,
+        spriteX, spriteY, // Sprite X, Sprite Y
+        flappyBird.largura, flappyBird.altura, // Tamanho do recorte na sprite  
+        flappyBird.x, flappyBird.y, // Dentro do canvas, onde vai desenhar a imagem
+        flappyBird.largura, flappyBird.altura, // Dentro do canvas, qual vai ser o tamanho do desenho
+      );
     }
   }
   return flappyBird;
@@ -206,6 +233,7 @@ Telas.JOGO = {
 function loop() { 
   telaAtiva.desenha();
   telaAtiva.atualiza();
+  frames++;
   requestAnimationFrame(loop); // Função do JS, ajudar a desenhar os quadros na tela de forma inteligente
 }
 
